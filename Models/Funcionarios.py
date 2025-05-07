@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
 class Funcionario(ABC):
-    def __init__(self, id, id_pessoa, salario, cargo):
+    def __init__(self, id, id_pessoa, salario, cargo, nome, CPF, data_nasc):
+        super().__init__(nome, CPF, data_nasc)
         self._id = id
         self._salario = salario
         self._cargo = cargo

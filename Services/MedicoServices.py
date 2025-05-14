@@ -1,21 +1,21 @@
-# Services/tabela_vendedor.py
 import sqlite3
 
-conexao = sqlite3.connect("Empresa.db")
+conexao = sqlite3.connect('Hospital.db')
 
 cursor = conexao.cursor()
 
 cursor.execute(
     '''
-        CREATE TABLE pessoas(
-            id INTEGER NOT NULL PRIMARY KEY,
-            nome TEXT NOT NULL,
-            CPF TEXT NOT NULL,  
-            data_nasc DATE,  
-        );
-    '''
+        CREATE TABLE medicos (
+            id INTEGER PRIMARY KEY,
+            crm TEXT NOT NULL,
+            especialidade TEXT NOT NULL,
+            id_funcionario INTEGER NOT NULL,
+            FOREIGN KEY (id_funcionario) REFERENCES funcionarios(id)
 
+);
+    '''
 )
 
 cursor.close()
-print("Tabela PESSOAS criada com sucesso!")
+print("Tabela MÉDICO criada com sucesso")

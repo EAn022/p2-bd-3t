@@ -15,7 +15,7 @@ cursor.execute(
         );
     '''
 
-);
+)
 
 cursor.close()
 print("Tabela MEDICOS criada com sucesso")

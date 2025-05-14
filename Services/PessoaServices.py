@@ -17,4 +17,4 @@ cursor.execute(
 )
 
 cursor.close()
-print("Tabela MÉDICO criada com sucesso")
+print("Tabela PESSOAS criada com sucesso")

@@ -10,6 +10,8 @@ cursor.execute(
             id INTEGER PRIMARY KEY,
             crm TEXT NOT NULL,
             especialidade TEXT NOT NULL,
+            id_funcionario INTEGER NOT NULL,
+            FOREIGN KEY (id_funcionario) REFERENCES funcionarios(id)
 
 );
     '''

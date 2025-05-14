@@ -1,7 +1,6 @@
-# Services/tabela_vendedor.py
 import sqlite3
 
-conexao = sqlite3.connect("Empresa.db")
+conexao = sqlite3.connect("Hospital.db")
 
 cursor = conexao.cursor()
 
@@ -11,7 +10,7 @@ cursor.execute(
             id INTEGER NOT NULL PRIMARY KEY,
             nome TEXT NOT NULL,
             CPF TEXT NOT NULL,  
-            data_nasc DATE,  
+            data_nasc DATE  
         );
     '''
 

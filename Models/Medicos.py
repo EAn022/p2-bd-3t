@@ -3,8 +3,8 @@ from Models.Funcionarios import Funcionario
 class Medico(Funcionario):
     def __init__(self, id, id_funcionario, salario, cargo, nome, CPF, data_nasc, crm, especialidade):
         super().__init__(id_funcionario, None, salario, cargo, nome, CPF, data_nasc)
-        self._id = id  # id da tabela Medicos
-        self._id_funcionario = id_funcionario  # FK para tabela Funcionarios
+        self._id = id  
+        self._id_funcionario = id_funcionario  
         self._crm = crm
         self._especialidade = especialidade
 

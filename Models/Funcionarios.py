@@ -17,6 +17,7 @@ class Funcionario(ABC, Pessoas):
 
     def get_salario(self):
         return self._salario
+    
     def set_salario(self, salario):
         self._salario = salario
 

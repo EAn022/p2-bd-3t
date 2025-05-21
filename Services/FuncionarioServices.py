@@ -7,7 +7,7 @@ cursor = conexao.cursor()
 cursor.execute(
     '''
         CREATE TABLE funcionarios(
-            id INTEGER NOT NULL PRIMARY KEY,
+            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             id_pessoa NOT NULL,
             salario FLOAT NOT NULL,
             cargo TEXT NOT NULL,

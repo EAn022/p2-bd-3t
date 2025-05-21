@@ -1,0 +1,129 @@
+import sqlite3
+from Models.Medicos import Medico
+
+def conectaBD():
+    conexao = sqlite3.connect("Hospital.db")
+    return conexao
+
+def incluirMedico(pessoa, funcionario, medico):
+    conexao = conectaBD()
+    cursor = conexao.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO pessoas (id, nome, CPF, data_nasc)
+            VALUES (?, ?, ?, ?)
+        """, (
+            pessoa.get_id(),
+            pessoa.get_nome(),
+            pessoa.get_cpf(),
+            pessoa.get_data_nasc()
+        ))
+
+        cursor.execute("""
+            INSERT INTO funcionarios (id, id_pessoa, salario, cargo)
+            VALUES (?, ?, ?, ?)
+        """, (
+            funcionario.get_id(),
+            funcionario.get_IdPessoa(),
+            funcionario.get_salario(),
+            funcionario.get_cargo()
+        ))
+
+        cursor.execute("""
+            INSERT INTO medicos (id, id_funcionario, crm, especialidade)
+            VALUES (?, ?, ?, ?)
+        """, (
+            medico.get_id(),
+            medico.get_id_funcionario(),
+            medico.get_crm(),
+            medico.get_especialidade()
+        ))
+   
+        conexao.commit()
+
+        print("Médico inserido com sucesso!")
+    except sqlite3.Error as e:
+        print(f"Erro ao inserir funcionário: {e}")
+    finally:
+        conexao.close()
+
+def consultarFuncionario():
+    conexao = conectaBD()
+    cursor = conexao.cursor()
+    
+    try:
+        cursor.execute('SELECT * FROM funcionario')
+        rows = cursor.fetchall()
+        
+        # Lista para armazenar os dados dos funcionários
+        dados = []
+        
+        for row in rows:
+            codigo, nome, tipo, diasTrabalhados, valorDia, salarioBase, comissao = row
+            
+            if tipo == 'FreeLancer':
+                funcionario = FreeLancer(codigo, nome, diasTrabalhados, valorDia)
+                salario = funcionario.calcularSalario()
+            elif tipo == 'Vendedor':
+                funcionario = Vendedor(codigo, nome, salarioBase, comissao)
+                salario = funcionario.calcularSalario()
+            
+            # Adiciona os dados do funcionário à lista
+            dados.append({
+                "Código": codigo,
+                "Nome": nome,
+                "Tipo": tipo,
+                "Dias Trabalhados": diasTrabalhados,
+                "Valor Dia": valorDia,
+                "Salário Base": salarioBase,
+                "Comissão": comissao,
+                "Salário Calculado": salario
+            })
+        
+        return dados
+    
+    except sqlite3.Error as e:
+        print(f"Erro ao consultar funcionários: {e}")
+        return []
+    
+    finally:
+        conexao.close()
+    
+def excluirFuncionario(codigo):
+    try:
+        conexao = conectaBD()
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM funcionario WHERE codigo = ?", (codigo,))
+        conexao.commit()
+        print(f"Funcionario com codigo {codigo} excluído com sucesso!")
+    except sqlite3.Error as e:
+        print(f"Erro ao excluir funcionario: {e}")
+    finally:
+        if conexao:
+            conexao.close()
+
+def alterarFuncionario(funcionario):
+    try:
+        conexao = conectaBD()
+        cursor = conexao.cursor()
+        cursor.execute('''
+            UPDATE funcionario 
+            SET codigo = ?, nome = ?, tipo = ?, diasTrabalhados = ?, valorDia = ?, salarioBase = ?, comissao = ?
+            WHERE codigo = ?
+        ''', (
+            funcionario["Código"],
+            funcionario["Nome"],
+            funcionario["Tipo"],
+            funcionario["Dias Trabalhados"],
+            funcionario["Valor Dia"],
+            funcionario["Salário Base"],
+            funcionario["Comissão"],
+            funcionario["Código"]
+        ))
+        conexao.commit()
+        print(f"Funcionário com código {funcionario['Código']} alterado com sucesso!")
+    except sqlite3.Error as e:
+        print(f"Erro ao alterar Funcionário: {e}")
+    finally:
+        if conexao:
+            conexao.close()

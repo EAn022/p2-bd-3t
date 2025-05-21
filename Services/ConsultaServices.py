@@ -7,7 +7,7 @@ cursor = conexao.cursor()
 cursor.execute(
     '''
         CREATE TABLE consultas (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             data_consulta DATE,
             observacoes TEXT NOT NULL,
             id_paciente INTEGER NOT NULL,

@@ -7,7 +7,7 @@ cursor = conexao.cursor()
 cursor.execute(
     '''
         CREATE TABLE pessoas(
-            id INTEGER NOT NULL PRIMARY KEY,
+            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             CPF TEXT NOT NULL,  
             data_nasc DATE  

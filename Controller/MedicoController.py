@@ -10,31 +10,32 @@ def incluirMedico(pessoa, funcionario, medico):
     cursor = conexao.cursor()
     try:
         cursor.execute("""
-            INSERT INTO pessoas (id, nome, CPF, data_nasc)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO pessoas (nome, CPF, data_nasc)
+            VALUES (?, ?, ?)
         """, (
-            pessoa.get_id(),
             pessoa.get_nome(),
             pessoa.get_cpf(),
             pessoa.get_data_nasc()
         ))
 
+        id_pessoa = cursor.lastrowid
+
         cursor.execute("""
-            INSERT INTO funcionarios (id, id_pessoa, salario, cargo)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO funcionarios (id_pessoa, salario, cargo)
+            VALUES (?, ?, ?)
         """, (
-            funcionario.get_id(),
-            funcionario.get_IdPessoa(),
+            id_pessoa,
             funcionario.get_salario(),
             funcionario.get_cargo()
         ))
 
+        id_funcionario = cursor.lastrowid
+
         cursor.execute("""
-            INSERT INTO medicos (id, id_funcionario, crm, especialidade)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO medicos (id_funcionario, crm, especialidade)
+            VALUES (?, ?, ?)
         """, (
-            medico.get_id(),
-            medico.get_id_funcionario(),
+            id_funcionario,
             medico.get_crm(),
             medico.get_especialidade()
         ))
@@ -43,7 +44,7 @@ def incluirMedico(pessoa, funcionario, medico):
 
         print("Médico inserido com sucesso!")
     except sqlite3.Error as e:
-        print(f"Erro ao inserir funcionário: {e}")
+        print(f"Erro ao inserir médico: {e}")
     finally:
         conexao.close()
 
@@ -52,32 +53,32 @@ def consultarFuncionario():
     cursor = conexao.cursor()
     
     try:
-        cursor.execute('SELECT * FROM funcionario')
+        cursor.execute(
+            '''
+                SELECT m.id, m.crm, m.especialidade, f.salario, f.cargo, p.nome, p.CPF, p.data_nasc
+                FROM medicos m
+                JOIN funcionarios f ON m.id_funcionario = f.id
+                JOIN pessoas p ON  f.id_pessoa = p.id;
+            '''   
+            )
         rows = cursor.fetchall()
         
         # Lista para armazenar os dados dos funcionários
         dados = []
         
         for row in rows:
-            codigo, nome, tipo, diasTrabalhados, valorDia, salarioBase, comissao = row
-            
-            if tipo == 'FreeLancer':
-                funcionario = FreeLancer(codigo, nome, diasTrabalhados, valorDia)
-                salario = funcionario.calcularSalario()
-            elif tipo == 'Vendedor':
-                funcionario = Vendedor(codigo, nome, salarioBase, comissao)
-                salario = funcionario.calcularSalario()
+            print(row)
+            id, crm, especialidade, salario, cargo, nome, cpf, = row
             
             # Adiciona os dados do funcionário à lista
             dados.append({
-                "Código": codigo,
-                "Nome": nome,
-                "Tipo": tipo,
-                "Dias Trabalhados": diasTrabalhados,
-                "Valor Dia": valorDia,
-                "Salário Base": salarioBase,
-                "Comissão": comissao,
-                "Salário Calculado": salario
+                "id": id,
+                "crm": crm,
+                "especialidade": especialidade,
+                "salario": salario,
+                "cargo": cargo,
+                "nome": salarioBase,
+                "cpf": comissao,
             })
         
         return dados

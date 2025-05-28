@@ -33,20 +33,19 @@ def show_medicos_page():
 
     elif Page_Funcionario == "Consultar":
         if st.button("Consultar"):
-            dados = funcionarioController.consultarFuncionario()
-            if dados:
-                # Formatação dos dados
-                for item in dados:
-                    for key in ["Valor Dia", "Salário Base", "Comissão", "Salário Calculado"]:
-                        if item[key] is not None:
-                            item[key] = round(item[key], 2)
-                
-                tb = pd.DataFrame(dados, columns=["Código", "Nome", "Tipo", "Dias Trabalhados", 
-                                                 "Valor Dia", "Salário Base", "Comissão", "Salário Calculado"])
-                st.header("Lista de Funcionários")
+            dados = medicoController.consultarMedico()
+        
+            if dados:           
+                tb = pd.DataFrame(dados, columns=["id", "nome", "cargo", "crm","especialidade", "salario", "cpf", "data_nasc"]) 
+                st.header("Lista de Médicos")
                 st.dataframe(tb, width=1000)
+
             else:
                 st.info("Nenhum Funcionário cadastrado.")
+
+
+
+
 
     elif Page_Funcionario == "Excluir":
         st.subheader("Excluir Funcionário")

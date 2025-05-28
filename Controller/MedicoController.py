@@ -48,7 +48,7 @@ def incluirMedico(medico):
     finally:
         conexao.close()
 
-def consultarFuncionario():
+def consultarMedico():
     conexao = conectaBD()
     cursor = conexao.cursor()
     
@@ -67,9 +67,8 @@ def consultarFuncionario():
         dados = []
         
         for row in rows:
-            print(row)
-            id, crm, especialidade, salario, cargo, nome, cpf, = row
-            
+            # print(row)
+            id, crm, especialidade, salario, cargo, nome, cpf, data_nasc = row
             # Adiciona os dados do funcionário à lista
             dados.append({
                 "id": id,
@@ -79,8 +78,8 @@ def consultarFuncionario():
                 "cargo": cargo,
                 "nome": nome,
                 "cpf": cpf,
+                "data_nasc": data_nasc
             })
-        
         return dados
     
     except sqlite3.Error as e:

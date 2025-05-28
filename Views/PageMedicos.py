@@ -9,9 +9,9 @@ def show_medicos_page():
     st.title('Cadastro de Médicos')
 
     # Menu de operações para Funcionário
-    Page_Funcionario = st.sidebar.selectbox("Operações", ["Incluir", "Consultar", "Excluir", "Alterar"])
+    Page_Medico = st.sidebar.selectbox("Operações", ["Incluir", "Consultar", "Excluir", "Alterar"])
 
-    if Page_Funcionario == "Incluir":   
+    if Page_Medico == "Incluir":   
         # Criar instâncias de medico, funcionario e pessoa
         medico = Medico(id="", id_funcionario="",  id_pessoa="", salario=0, cargo="", nome="", CPF="", data_nasc="", crm="", especialidade="")
 
@@ -31,7 +31,7 @@ def show_medicos_page():
 
     
 
-    elif Page_Funcionario == "Consultar":
+    elif Page_Medico == "Consultar":
         if st.button("Consultar"):
             dados = medicoController.consultarMedico()
         
@@ -47,27 +47,38 @@ def show_medicos_page():
 
 
 
-    elif Page_Funcionario == "Excluir":
-        st.subheader("Excluir Funcionário")
-        dados = funcionarioController.consultarFuncionario()
+    elif Page_Medico == "Excluir":
+        st.subheader("Excluir Medico")
+        dados = medicoController.consultarMedico()
 
         if dados:
-            df = pd.DataFrame(dados, columns=["Código", "Nome", "Tipo", "Dias Trabalhados", 
-                                            "Valor Dia", "Salário Base", "Comissão", "Salário Calculado"])
+            df = pd.DataFrame(dados, columns=["id", "nome", "cargo", "crm","especialidade", "salario", "cpf", "data_nasc"])
             st.table(df)
 
-            codigo_excluir = st.number_input("Digite o código do funcionário que deseja excluir", min_value=1, step=1)
+            id = st.number_input("Digite o código do médico que deseja excluir", min_value=1, step=1)
+            id = str(id)
             if st.button("Excluir"):
                 try:
-                    funcionarioController.excluirFuncionario(codigo_excluir)
-                    st.success(f"Funcionário com código {codigo_excluir} excluído com sucesso!")
+                    medicoController.excluirMedico(id)
+                    st.success(f"Funcionário com código {id} excluído com sucesso!")
                     st.rerun()
                 except Exception as e:
-                    st.error(f"Erro ao excluir funcionário: {e}")
+                    st.error(f"Erro ao excluir médico: {e}")
         else:
-            st.info("Nenhum funcionário cadastrado.")
+            st.info("Nenhum médico cadastrado.")
 
-    elif Page_Funcionario == "Alterar":
+
+
+
+
+
+
+
+
+
+
+
+    elif Page_Medico == "Alterar":
         st.subheader("Alterar Funcionário")
         dados = funcionarioController.consultarFuncionario()
 

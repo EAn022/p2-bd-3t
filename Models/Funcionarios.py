@@ -1,9 +1,8 @@
-from abc import ABC, abstractmethod
 from Models.Pessoas import Pessoas
 
-class Funcionario(ABC, Pessoas):
+class Funcionario(Pessoas):
     def __init__(self, id, id_pessoa, salario, cargo, nome, CPF, data_nasc):
-        super().__init__(nome, CPF, data_nasc)
+        super().__init__(id_pessoa, nome, CPF, data_nasc)
         self._id = id
         self._salario = salario
         self._cargo = cargo

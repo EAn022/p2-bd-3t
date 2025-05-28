@@ -5,7 +5,7 @@ def conectaBD():
     conexao = sqlite3.connect("Hospital.db")
     return conexao
 
-def incluirMedico(pessoa, funcionario, medico):
+def incluirMedico(medico):
     conexao = conectaBD()
     cursor = conexao.cursor()
     try:
@@ -13,9 +13,9 @@ def incluirMedico(pessoa, funcionario, medico):
             INSERT INTO pessoas (nome, CPF, data_nasc)
             VALUES (?, ?, ?)
         """, (
-            pessoa.get_nome(),
-            pessoa.get_cpf(),
-            pessoa.get_data_nasc()
+            medico.get_nome(),
+            medico.get_cpf(),
+            medico.get_data_nasc()
         ))
 
         id_pessoa = cursor.lastrowid
@@ -25,8 +25,8 @@ def incluirMedico(pessoa, funcionario, medico):
             VALUES (?, ?, ?)
         """, (
             id_pessoa,
-            funcionario.get_salario(),
-            funcionario.get_cargo()
+            medico.get_salario(),
+            medico.get_cargo()
         ))
 
         id_funcionario = cursor.lastrowid
@@ -77,54 +77,54 @@ def consultarFuncionario():
                 "especialidade": especialidade,
                 "salario": salario,
                 "cargo": cargo,
-                "nome": salarioBase,
-                "cpf": comissao,
+                "nome": nome,
+                "cpf": cpf,
             })
         
         return dados
     
     except sqlite3.Error as e:
-        print(f"Erro ao consultar funcionários: {e}")
+        print(f"Erro ao consultar médicos: {e}")
         return []
     
     finally:
         conexao.close()
     
-def excluirFuncionario(codigo):
-    try:
-        conexao = conectaBD()
-        cursor = conexao.cursor()
-        cursor.execute("DELETE FROM funcionario WHERE codigo = ?", (codigo,))
-        conexao.commit()
-        print(f"Funcionario com codigo {codigo} excluído com sucesso!")
-    except sqlite3.Error as e:
-        print(f"Erro ao excluir funcionario: {e}")
-    finally:
-        if conexao:
-            conexao.close()
+# def excluirFuncionario(codigo):
+#     try:
+#         conexao = conectaBD()
+#         cursor = conexao.cursor()
+#         cursor.execute("DELETE FROM funcionario WHERE codigo = ?", (codigo,))
+#         conexao.commit()
+#         print(f"Funcionario com codigo {codigo} excluído com sucesso!")
+#     except sqlite3.Error as e:
+#         print(f"Erro ao excluir funcionario: {e}")
+#     finally:
+#         if conexao:
+#             conexao.close()
 
-def alterarFuncionario(funcionario):
-    try:
-        conexao = conectaBD()
-        cursor = conexao.cursor()
-        cursor.execute('''
-            UPDATE funcionario 
-            SET codigo = ?, nome = ?, tipo = ?, diasTrabalhados = ?, valorDia = ?, salarioBase = ?, comissao = ?
-            WHERE codigo = ?
-        ''', (
-            funcionario["Código"],
-            funcionario["Nome"],
-            funcionario["Tipo"],
-            funcionario["Dias Trabalhados"],
-            funcionario["Valor Dia"],
-            funcionario["Salário Base"],
-            funcionario["Comissão"],
-            funcionario["Código"]
-        ))
-        conexao.commit()
-        print(f"Funcionário com código {funcionario['Código']} alterado com sucesso!")
-    except sqlite3.Error as e:
-        print(f"Erro ao alterar Funcionário: {e}")
-    finally:
-        if conexao:
-            conexao.close()
+# def alterarFuncionario(funcionario):
+#     try:
+#         conexao = conectaBD()
+#         cursor = conexao.cursor()
+#         cursor.execute('''
+#             UPDATE funcionario 
+#             SET codigo = ?, nome = ?, tipo = ?, diasTrabalhados = ?, valorDia = ?, salarioBase = ?, comissao = ?
+#             WHERE codigo = ?
+#         ''', (
+#             funcionario["Código"],
+#             funcionario["Nome"],
+#             funcionario["Tipo"],
+#             funcionario["Dias Trabalhados"],
+#             funcionario["Valor Dia"],
+#             funcionario["Salário Base"],
+#             funcionario["Comissão"],
+#             funcionario["Código"]
+#         ))
+#         conexao.commit()
+#         print(f"Funcionário com código {funcionario['Código']} alterado com sucesso!")
+#     except sqlite3.Error as e:
+#         print(f"Erro ao alterar Funcionário: {e}")
+#     finally:
+#         if conexao:
+#             conexao.close()

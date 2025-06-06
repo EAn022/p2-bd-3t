@@ -105,6 +105,7 @@ def excluirMedico(id_m):
                 ''', (id_m)   
                 )
             rows = cursor.fetchall()       
+
             for row in rows:
                 id_f, id_p = row
             
@@ -126,28 +127,65 @@ def excluirMedico(id_m):
         if conexao:
             conexao.close()
 
-# def alterarFuncionario(funcionario):
-#     try:
-#         conexao = conectaBD()
-#         cursor = conexao.cursor()
-#         cursor.execute('''
-#             UPDATE funcionario 
-#             SET codigo = ?, nome = ?, tipo = ?, diasTrabalhados = ?, valorDia = ?, salarioBase = ?, comissao = ?
-#             WHERE codigo = ?
-#         ''', (
-#             funcionario["Código"],
-#             funcionario["Nome"],
-#             funcionario["Tipo"],
-#             funcionario["Dias Trabalhados"],
-#             funcionario["Valor Dia"],
-#             funcionario["Salário Base"],
-#             funcionario["Comissão"],
-#             funcionario["Código"]
-#         ))
-#         conexao.commit()
-#         print(f"Funcionário com código {funcionario['Código']} alterado com sucesso!")
-#     except sqlite3.Error as e:
-#         print(f"Erro ao alterar Funcionário: {e}")
-#     finally:
-#         if conexao:
-#             conexao.close()
+def alterarMedico(medico):
+    try:
+        conexao = conectaBD()
+        cursor = conexao.cursor()
+        
+        # Consulta para pegar os IDs necessários
+        cursor.execute("""
+            SELECT f.id, p.id
+            FROM medicos m
+            JOIN funcionarios f ON m.id_funcionario = f.id
+            JOIN pessoas p ON f.id_pessoa = p.id
+            WHERE m.id = ?;
+        """, 
+        (medico.get_id(),))
+        resultado = cursor.fetchone()
+
+        # Verifica se os ids foram retornados
+        if not resultado:
+            print("Médico não encontrado.")
+            return
+
+        # Armazena os ids em variaveis distintas
+        id_funcionario, id_pessoa = resultado
+
+        cursor.execute("""
+            UPDATE medicos
+            SET crm = ?, especialidade = ?
+            WHERE id = ?;
+        """, (
+            medico.get_crm(),
+            medico.get_especialidade(),
+            medico.get_id()
+        ))
+
+        cursor.execute("""
+            UPDATE funcionarios
+            SET salario = ?, cargo = ?
+            WHERE id = ?;
+        """, (
+            medico.get_salario(),
+            medico.get_cargo(),
+            id_funcionario
+        ))
+
+        cursor.execute("""
+            UPDATE pessoas
+            SET nome = ?, CPF = ?, data_nasc = ?
+            WHERE id = ?;
+        """, (
+            medico.get_nome(),
+            medico.get_cpf(),
+            medico.get_data_nasc(),
+            id_pessoa
+        ))
+
+        conexao.commit()
+        print(f"Médico com código {medico.get_id()} alterado com sucesso!")
+    except sqlite3.Error as e:
+        print(f"Erro ao alterar médico: {e}")
+    finally:
+        if conexao:
+            conexao.close()

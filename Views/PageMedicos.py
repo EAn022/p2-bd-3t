@@ -1,9 +1,8 @@
+import sqlite3
 import streamlit as st
 import pandas as pd
 import Controller.MedicoController as medicoController
 from Models.Medicos import Medico
-# from Models.FreeLancer import FreeLancer
-# from Models.Vendedor import Vendedor
 
 def show_medicos_page():
     st.title('Cadastro de Médicos')
@@ -22,14 +21,13 @@ def show_medicos_page():
         medico.set_cargo(st.text_input("Digite seu cargo"))
         medico.set_crm(st.text_input("Digite seu CRM"))
         medico.set_especialidade(st.text_input("Digite sua especialidade"))
-        medico.set_salario(st.number_input("Digite seu salário", format="%.2f"))
+        medico.set_salario(st.number_input("Digite seu salário", min_value=0.0, format="%.2f"))
 
         # Botão para inserir
         if st.button("Inserir"):
             medicoController.incluirMedico(medico)
             st.success("Medico adicionado com sucesso!")
 
-    
 
     elif Page_Medico == "Consultar":
         if st.button("Consultar"):
@@ -42,9 +40,6 @@ def show_medicos_page():
 
             else:
                 st.info("Nenhum Funcionário cadastrado.")
-
-
-
 
 
     elif Page_Medico == "Excluir":
@@ -68,93 +63,69 @@ def show_medicos_page():
             st.info("Nenhum médico cadastrado.")
 
 
-
-
-
-
-
-
-
-
-
-
     elif Page_Medico == "Alterar":
-        st.subheader("Alterar Funcionário")
-        dados = funcionarioController.consultarFuncionario()
+        st.subheader("Alterar Médico")
+        dados = medicoController.consultarMedico()
 
         if dados:
-            df = pd.DataFrame(dados, columns=["Código", "Nome", "Tipo", "Dias Trabalhados", 
-                                            "Valor Dia", "Salário Base", "Comissão", "Salário Calculado"])
+            df = pd.DataFrame(dados, columns=["id", "nome", "cargo", "crm","especialidade", "salario", "cpf", "data_nasc"])
             st.table(df)
 
-            codigo_alterar = st.number_input("Digite o código do funcionário que deseja alterar", min_value=1, step=1)
-            funcionario_data = next((item for item in dados if item["Código"] == codigo_alterar), None)
+            id_alterar = st.number_input("Digite o código do funcionário que deseja alterar", min_value=0, step=1)
 
-            if funcionario_data:
-                if funcionario_data["Tipo"] == "FreeLancer":
-                    # Criar instância de FreeLancer com os dados atuais
-                    funcionario = FreeLancer(
-                        funcionario_data["Código"],
-                        funcionario_data["Nome"],
-                        funcionario_data["Dias Trabalhados"],
-                        funcionario_data["Valor Dia"]
-                    )
+            try:
+                conexao = medicoController.conectaBD()
+                cursor = conexao.cursor()
+
+                cursor.execute(
+                ''' 
+                    SELECT m.id, m.crm, m.especialidade, f.salario, f.cargo, p.nome, p.CPF, p.data_nasc
+                    FROM medicos m
+                    JOIN funcionarios f ON m.id_funcionario = f.id
+                    JOIN pessoas p ON  f.id_pessoa = p.id
+                    WHERE m.id = ?;
+                ''',   
+                (str(id_alterar),))
+
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    st.error("Médico não encontrado.")
                 else:
-                    # Criar instância de Vendedor com os dados atuais
-                    funcionario = Vendedor(
-                        funcionario_data["Código"],
-                        funcionario_data["Nome"],
-                        funcionario_data["Salário Base"],
-                        funcionario_data["Comissão"]
-                    )
+                    id, crm, especialidade, salario, cargo, nome, cpf, data_nasc = resultado
 
-                with st.form(key="alteraFuncionario"):
-                    # Usar setters para atualizar os valores
-                    st.write(f"Tipo: {funcionario_data['Tipo']}")
-                    funcionario.set_codigo(st.number_input("Código: ", min_value=0, value=funcionario.get_codigo()))
-                    funcionario.set_nome(st.text_input("Nome: ", value=funcionario.get_nome()))
+                    with st.form(key="form_alterar_medico"):
+                        nome = st.text_input("Nome", value=nome)
+                        cpf = st.text_input("CPF", value=cpf)
+                        data_nasc = st.text_input("Data de nascimento (DD/MM/YYYY)", value=data_nasc)
+                        cargo = st.text_input("Cargo", value=cargo)
+                        crm = st.text_input("CRM", value=crm)
+                        especialidade = st.text_input("Especialidade", value=especialidade)
+                        salario = st.number_input("Salário", value=float(salario), format="%.2f")
 
-                    if funcionario_data["Tipo"] == "FreeLancer":
-                        funcionario.set_diasTrabalhados(st.number_input("Dias trabalhados: ", 
-                                                                      min_value=0, 
-                                                                      value=funcionario.get_diasTrabalhados()))
-                        funcionario.set_valorDia(st.number_input("Valor por dia: ", 
-                                                               min_value=0.0, 
-                                                               format="%.2f", 
-                                                               value=funcionario.get_valorDia()))
-                    else:
-                        funcionario.set_salarioBase(st.number_input("Salário base: ", 
-                                                                  min_value=0.0, 
-                                                                  format="%.2f", 
-                                                                  value=funcionario.get_salarioBase()))
-                        funcionario.set_comissao(st.number_input("Comissão: ", 
-                                                               min_value=0.0, 
-                                                               format="%.2f", 
-                                                               value=funcionario.get_comissao()))
+                        if st.form_submit_button("Salvar Alterações"):
+                            medico_atualizado = Medico(
+                                id=id,
+                                id_funcionario="",
+                                id_pessoa="",
+                                nome=nome,
+                                CPF=cpf,
+                                data_nasc=data_nasc,
+                                cargo=cargo,
+                                crm=crm,
+                                especialidade=especialidade,
+                                salario=salario
+                            )
 
-                    # Mostrar salário calculado
-                    salario = funcionario.calcularSalario()
-                    st.write(f"Salário Calculado: R$ {salario:.2f}")
+                            try:
+                                medicoController.alterarMedico(medico_atualizado)
+                                st.success("Médico alterado com sucesso!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Erro ao alterar médico: {e}")
 
-                    if st.form_submit_button("Confirmar Alterações"):
-                        try:
-                            # Preparar dados para atualização
-                            dados_atualizados = {
-                                "Código": funcionario.get_codigo(),
-                                "Nome": funcionario.get_nome(),
-                                "Tipo": funcionario_data["Tipo"],
-                                "Dias Trabalhados": funcionario.get_diasTrabalhados() if hasattr(funcionario, 'get_diasTrabalhados') else None,
-                                "Valor Dia": funcionario.get_valorDia() if hasattr(funcionario, 'get_valorDia') else None,
-                                "Salário Base": funcionario.get_salarioBase() if hasattr(funcionario, 'get_salarioBase') else None,
-                                "Comissão": funcionario.get_comissao() if hasattr(funcionario, 'get_comissao') else None
-                            }
-                            
-                            funcionarioController.alterarFuncionario(dados_atualizados)
-                            st.success("Funcionário alterado com sucesso!")
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"Erro ao alterar funcionário: {e}")
-            else:
-                st.error("Funcionário não encontrado.")
-        else:
-            st.info("Nenhum funcionário cadastrado.")
+            except sqlite3.Error as e:
+                st.error(f"Erro ao encontrar médico: {e}")
+            finally:
+                if conexao:
+                    conexao.close()

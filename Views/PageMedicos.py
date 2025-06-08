@@ -129,3 +129,5 @@ def show_medicos_page():
             finally:
                 if conexao:
                     conexao.close()
+        else:
+            st.info("Nenhum médico cadastrado.")

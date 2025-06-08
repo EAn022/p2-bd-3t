@@ -1,8 +1,8 @@
 from Models.Pessoas import Pessoas
 
-class Pacientes(Pessoas):
-    def __init__(self, id, id_pessoa, nome, data_nasc, CPF):
-        super().__init__(nome, data_nasc, CPF)
+class Paciente(Pessoas):
+    def __init__(self, id, id_pessoa, nome, CPF, data_nasc):
+        super().__init__(id_pessoa, nome, CPF, data_nasc)
         self._id = id
         self._id_pessoa = id_pessoa
     

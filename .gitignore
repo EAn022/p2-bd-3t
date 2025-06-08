@@ -1,2 +1,11 @@
+# Ignora arquivos db
 *.db
-__pycache__
+
+# Ignora todos os diretórios __pycache__
+__pycache__/
+**/__pycache__/
+
+# Ignora arquivos compilados do Python
+*.pyc
+*.pyo
+*.pyd

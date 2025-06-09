@@ -31,7 +31,7 @@ class Consulta:
         return self._data_consulta
     
     def set_data_consulta(self, data_consulta):
-        self._data_consulta - data_consulta
+        self._data_consulta = data_consulta
 
     
     def get_observacoes(self):

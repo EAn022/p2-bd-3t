@@ -102,7 +102,7 @@ def excluirMedico(id_m):
                     JOIN funcionarios f ON m.id_funcionario = f.id
                     JOIN pessoas p ON  f.id_pessoa = p.id
                     WHERE m.id = ?;
-                ''', (id_m)   
+                ''', (id_m,)   
                 )
             rows = cursor.fetchall()       
 
@@ -116,9 +116,9 @@ def excluirMedico(id_m):
             print(f"Erro ao consultar médicos: {e}")
 
 
-        cursor.execute("DELETE FROM medicos WHERE id = ?", (id_m))
-        cursor.execute("DELETE FROM funcionarios WHERE id = ?", (id_f))
-        cursor.execute("DELETE FROM pessoas WHERE id = ?", (id_p))
+        cursor.execute("DELETE FROM medicos WHERE id = ?", (id_m,))
+        cursor.execute("DELETE FROM funcionarios WHERE id = ?", (id_f,))
+        cursor.execute("DELETE FROM pessoas WHERE id = ?", (id_p,))
         conexao.commit()
         print(f"Medico com id {id} excluído com sucesso!")
     except sqlite3.Error as e:
